@@ -1,0 +1,32 @@
+01 using UnityEngine;
+02 using System.Collections;
+03 //Determines if a clear line or path exists between two objects
+04 public class ObjectPath : MonoBehaviour
+05 {
+06 //Reference to sample enemy object
+07 public GameObject Enemy = null;
+08
+09 //Layer mask to limit line detection
+10 public LayerMask LM;
+11 //----------------------------------------------------
+12 // Update is called once per frame
+13 void Update ()
+14 {
+Chapter 3
+[ 111 ]
+15 //Check if clear path between objects
+16 if(!Physics.Linecast(transform.position,
+Enemy.transform.position, LM))
+17 {
+18 //There is clear path
+19 Debug.Log ("Path clear");
+20 }
+21 }
+22 //----------------------------------------------------
+23 //Show helper debug line in viewport
+24 void OnDrawGizmos()
+25 {
+26 Gizmos.DrawLine(transform.position, Enemy.transform.position);
+27 }
+28 //----------------------------------------------------
+29 }

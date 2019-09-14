@@ -1,0 +1,166 @@
+ using UnityEngine;
+ using System.Collections;
+ using System.Collections.Generic;
+ //----------------------------------------------------
+ //Class derives from IEnumerator
+ //Handles bounds safe iteration of all wizards in scene
+ public class WizardEnumerator : IEnumerator
+ {
+ //Current wizard object pointed to by enumerator
+ private Wizard CurrentObj = null;
+ //----------------------------------------------------
+ //Overrides movenext
+ public bool MoveNext()
+ {
+ //Get next wizard
+ CurrentObj = (CurrentObj==null) ? Wizard.FirstCreated :
+CurrentObj.NextWizard;
+
+ //Return the next wizard
+ return (CurrentObj != null);
+ }
+ //----------------------------------------------------
+///Resets the iterator back to the first wizard
+ public void Reset()
+ {
+ CurrentObj = null;
+ }
+ //----------------------------------------------------
+ //C# Property to get current wizard
+ public object Current
+ {
+ get{return CurrentObj;}
+ }
+ //----------------------------------------------------
+ }
+ //----------------------------------------------------
+ //Sample class defining a wizard object
+ //Derives from IEnumerable, allowing looping with foreach
+ [System.Serializable]
+ public class Wizard : MonoBehaviour, IEnumerable
+ {
+ //----------------------------------------------------
+ //Reference to last created wizard
+ public static Wizard LastCreated = null;
+
+ //Reference to first created wizard
+ public static Wizard FirstCreated = null;
+
+ //Reference to next wizard in the list
+ public Wizard NextWizard = null;
+
+ //Reference to previous wizard in the list
+ public Wizard PrevWizard = null;
+
+ //Name of this wizard
+ public string WizardName = "";
+ //----------------------------------------------------
+ //Constructor
+ void Awake()
+ {
+ //Should we update first created
+ if(FirstCreated==null)
+
+ FirstCreated = this;
+
+ //Should we update last created
+ if(Wizard.LastCreated != null)
+ {
+ Wizard.LastCreated.NextWizard = this;
+ PrevWizard = Wizard.LastCreated;
+ }
+
+ Wizard.LastCreated = this;
+ }
+ //----------------------------------------------------
+ //Called on object destruction
+ void OnDestroy()
+ {
+ //Repair links if object in chain is destroyed
+ if(PrevWizard!=null)
+ PrevWizard.NextWizard = NextWizard;
+
+ if(NextWizard!=null)
+ NextWizard.PrevWizard = PrevWizard;
+ }
+ //----------------------------------------------------
+ //Get this class as enumerator
+ public IEnumerator GetEnumerator()
+ {
+ return new WizardEnumerator();
+ }
+ //----------------------------------------------------
+ }
+ //----------------------------------------------------------------
+---
+Notes:
+The following are the comments for code sample 6-8:
+• Lines 07 and 39: Two classes are created here: the irst is WizardEnumerator,
+which implements IEnumerator, and the second is Wizard, which
+implements IEnumerable. The WizardEnumerator class is instantiated
+simply to iterate over a collection of wizards that keeps track of the current
+wizard in the iteration process. To loop through or iterate over all wizards in
+the scene, it relies on member variables for the Wizard class, as we'll see in
+the upcoming sections.
+Working with Mono
+[ 204 ]
+• Lines 13, 23, and 29: The WizardEnumerator class implements the methods
+and properties of IEnumerator, speciically, MoveNext (which iterates over to
+the next wizard in the cycle), Reset (which resets the iterator back to the irst
+wizard), and Current (which returns the active wizard in the cycle).
+• Line 39: The Wizard class encapsulates a wizard character in the scene and
+inherits from two classes: MonoBehaviour and IEnumerable. This means
+that all the features of both classes come together in this derived class. It
+internally maintains several variables that allow the enumerator to loop
+through all the wizard instances in the scene at any time. First, Wizard holds
+the FirstCreated and LastCreated static members (which are global to all
+the wizard instances). These variables are set when objects are created (see
+the Awake function in line 58). FirstCreated always refers to the instance of
+a wizard that was created irst, and LastCreated always to the most recently
+created instance.
+• Lines 48 and 52: The Wizard class also maintains the instance variables,
+NextWizard and PrevWizard. This implements a doubly-linked list; that
+is, each instance of the wizard points to the previously and subsequently
+created instance, which allows a chain-like connection between all wizards.
+The irst wizard will have PrevWizard or null, and the last wizard will have
+NextWizard or null. These variables make it possible for the iterator to cycle
+through all wizard instances even when none of them are in an array.
+• Line 86: The GetEnumerator method returns an instance to an Enumerator
+object. This is required by the IEnumerable interface and allows a foreach
+loop across all wizards.
+
+
+the following code sample
+can enumerate all wizards:
+void Update()
+{
+//Press space to list all wizards in scene
+if(Input.GetKeyDown(KeyCode.Space))
+{
+//Get first wizard through static member
+Wizard WizardCollection= Wizard.FirstCreated;
+//If there is at least one wizard, then loop them all
+if(Wizard.FirstCreated != null)
+{
+//Loop through all wizards in foreach
+foreach(Wizard W in WizardCollection)
+
+Debug.Log (W.WizardName);
+}
+}
+}
+You can also enumerate through all wizards outside a foreach loop by accessing the
+Enumerator object directly, as shown in the following code sample 6-10:
+void Update()
+{
+//Press space to list all wizards in scene
+if(Input.GetKeyDown(KeyCode.Space))
+{
+//Get Enumerator
+IEnumerator WE = Wizard.FirstCreated.GetEnumerator();
+while(WE.MoveNext())
+{
+Debug.Log(((Wizard)WE.Current).WizardName);
+}
+}
+}

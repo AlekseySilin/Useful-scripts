@@ -1,0 +1,29 @@
+//Returns the nearest game object
+GameObject GetNearestGameObject(GameObject Source, GameObject[]
+DestObjects)
+{
+//Assign first object
+GameObject Nearest = DestObjects[0];
+//Shortest distance
+float ShortestDistance =
+Vector3.Distance(Source.transform.position,
+DestObjects[0].transform.position);
+//Loop through all objects
+foreach(GameObject Obj in DestObjects)
+{
+//Calculate distance
+float Distance = Vector3.Distance(Source.transform.position,
+Obj.transform.position);
+Chapter 3
+[ 109 ]
+//If this is shortest, then update
+if(Distance < ShortestDistance)
+{
+//Is shortest, now update
+Nearest = Obj;
+ShortestDistance = Distance;
+}
+}
+//Return nearest
+return Nearest;
+}

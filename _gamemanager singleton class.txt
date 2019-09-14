@@ -1,0 +1,52 @@
+01 using UnityEngine;
+02 using System.Collections;
+03 //-----------------------------------------
+04 //Sample Game Manager class - Singleton Object
+05 public class GameManager : MonoBehaviour
+06 {
+07 //-----------------------------------------
+08 //C# Property to get access to singleton instance
+09 //Read only - only has get accessor
+10 public static GameManager Instance
+11 {
+12 //return reference to private instance
+13 get
+14 {
+15 return instance;
+16 }
+17 }
+18
+19 //-----------------------------------------
+20 private static GameManager instance = null;
+21 //-----------------------------------------
+22 //High score
+23 public int HighScore = 0;
+24
+25 //Is game paused
+26 public bool IsPaused = false;
+Chapter 3
+[ 121 ]
+27
+28 //Is player input allowed
+29 public bool InputAllowed = true;
+30 //-----------------------------------------
+31 // Use this for initialization
+32 void Awake ()
+33 {
+34 //Check if existing instance of class exists in scene
+35 //If so, then destroy this instance
+36 if(instance)
+37 {
+38 DestroyImmediate(gameObject);
+39 return;
+40 }
+41
+42 //Make this active and only instance
+43 instance = this;
+44
+45 //Make game manager persistent
+46 DontDestroyOnLoad(gameObject);
+47 }
+48 //-----------------------------------------
+49 }
+50 //-----------------------------------------
