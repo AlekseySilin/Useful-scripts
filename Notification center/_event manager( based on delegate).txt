@@ -1,0 +1,156 @@
+001 using UnityEngine;
+002 using System.Collections;
+003 using System.Collections.Generic;
+004 //-----------------------------------------------------------
+005 //Enum defining all possible game events
+006 //More events should be added to the list
+007 public enum EVENT_TYPE {GAME_INIT,
+008 GAME_END,
+009 AMMO_CHANGE,
+010 HEALTH_CHANGE,
+011 DEAD};
+012 //-----------------------------------------------------------
+013 //Singleton EventManager to send events to listeners
+014 //Works with delegate implementations
+Event-driven Programming
+[ 142 ]
+015 public class EventManager : MonoBehaviour
+016 {
+017 #region C# properties
+018 //-----------------------------------------------------------
+019 //Public access to instance
+020 public static EventManager Instance
+021 {
+022 get{return instance;}
+023 set{}
+024 }
+025 #endregion
+026
+027 #region variables
+028 //Notifications Manager instance (singleton design pattern)
+029 private static EventManager instance = null;
+030
+031 // Declare a delegate type for events
+032 public delegate void OnEvent(EVENT_TYPE Event_Type,
+Component Sender, object Param = null);
+033
+034 //Array of listener objects
+035 private Dictionary<EVENT_TYPE, List<OnEvent>> Listeners
+= new Dictionary<EVENT_TYPE, List<OnEvent>>();
+036 #endregion
+037 //-----------------------------------------------------------
+038 #region methods
+039 //Called at start-up to initialize
+040 void Awake()
+041 {
+042 //If no instance exists, then assign this instance
+043 if(instance == null)
+044 {
+045 instance = this;
+046 DontDestroyOnLoad(gameObject);
+047 }
+048 else
+049 DestroyImmediate(this);
+050 }
+051 //-----------------------------------------------------------
+052 /// <summary>
+Chapter 4
+[ 143 ]
+053 /// Add listener-object to array of listeners
+054 /// </summary>
+055 /// <param name="Event_Type">Event to Listen for</param>
+056 /// <param name="Listener">Object to listen for
+event</param>
+057 public void AddListener(EVENT_TYPE Event_Type, OnEvent
+Listener)
+058 {
+059 //List of listeners for this event
+060 List<OnEvent> ListenList = null;
+061
+062 // Check existing event. If one exists, add to list
+063 if(Listeners.TryGetValue(Event_Type, out ListenList))
+064 {
+065 //List exists, so add new item
+066 ListenList.Add(Listener);
+067 return;
+068 }
+069
+070 //Otherwise create new list as dictionary key
+071 ListenList = new List<OnEvent>();
+072 ListenList.Add(Listener);
+073 Listeners.Add(Event_Type, ListenList);
+074 }
+075 //-----------------------------------------------------------
+076 /// <summary>
+077 /// Function to post event to listeners
+078 /// </summary>
+079 /// <param name="Event_Type">Event to invoke</param>
+080 /// <param name="Sender">Object invoking event</param>
+081 /// <param name="Param">Optional argument</param>
+082 public void PostNotification(EVENT_TYPE Event_Type,
+Component Sender, object Param = null)
+083 {
+084 //Notify all listeners of an event
+085
+086 //List of listeners for this event only
+087 List<OnEvent> ListenList = null;
+088
+089 //If no entry exists, then exit
+Event-driven Programming
+[ 144 ]
+090 if(!Listeners.TryGetValue(Event_Type, out ListenList))
+091 return;
+092
+093 //Entry exists. Now notify appropriate listeners
+094 for(int i=0; i<ListenList.Count; i++)
+095 {
+096 if(!ListenList[i].Equals(null))
+097 ListenList[i](Event_Type, Sender, Param);
+098 }
+099 }
+100 //-----------------------------------------------------------
+101 //Remove event from dictionary, including all listeners
+102 public void RemoveEvent(EVENT_TYPE Event_Type)
+103 {
+104 //Remove entry from dictionary
+105 Listeners.Remove(Event_Type);
+106 }
+107 //-----------------------------------------------------------
+108 //Remove all redundant entries from the Dictionary
+109 public void RemoveRedundancies()
+110 {
+111 //Create new dictionary
+112 Dictionary<EVENT_TYPE, List<OnEvent>> TmpListeners
+= new Dictionary<EVENT_TYPE, List<OnEvent>>();
+113
+114 //Cycle through all dictionary entries
+115 foreach(KeyValuePair<EVENT_TYPE, List<OnEvent>>
+Item in Listeners)
+116 {
+117 //Cycle through all listeners
+118 for(int i = Item.Value.Count-1; i>=0; i--)
+119 {
+120 //If null, then remove item
+121 if(Item.Value[i].Equals(null))
+122 Item.Value.RemoveAt(i);
+123 }
+124
+125 //If items remain, then add to tmp dictionary
+126 if(Item.Value.Count > 0)
+127 TmpListeners.Add (Item.Key, Item.Value);
+Chapter 4
+[ 145 ]
+128 }
+129
+130 //Replace listeners with new dictionary
+131 Listeners = TmpListeners;
+132 }
+133 //-----------------------------------------------------------
+134 //Called on scene change. Clean up dictionary
+135 void OnLevelWasLoaded()
+136 {
+137 RemoveRedundancies();
+138 }
+139 //-----------------------------------------------------------
+140 #endregion
+141 }

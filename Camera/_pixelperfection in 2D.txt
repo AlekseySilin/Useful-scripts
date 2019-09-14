@@ -1,0 +1,32 @@
+ //-------------------------------------------------------
+ using UnityEngine;
+ using System.Collections;
+ //-------------------------------------------------------
+ [RequireComponent(typeof(Camera))]
+ //-------------------------------------------------------
+ public class OrthoCam : MonoBehaviour
+ {
+	//private reference to camera component
+	private Camera Cam = null;
+	//Reference to Pixels to World Units Scale
+	public float PixelsToWorldUnits = 200f;//эту цифру надо сверять в Unity Inspector, пункт Pixels to Units спрайтовой текстуры
+	
+	//-------------------------------------------------------
+	// Use this for initialization
+	void Awake ()
+	{
+		//Get camera reference
+		Cam = GetComponent<Camera>();
+	}
+ 
+	//-------------------------------------------------------
+	// Update is called once per frame
+	void LateUpdate ()
+	{
+		//Update orthographic size
+		Cam.orthographicSize = Screen.height / 2f /
+		PixelsToWorldUnits;
+	}
+ //-------------------------------------------------------
+ }
+ //-------------------------------------------------------

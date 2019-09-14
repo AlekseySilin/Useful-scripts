@@ -1,0 +1,19 @@
+01 using UnityEngine;
+02 using System.Collections;
+03 //-----------------------------------------------------------
+04 //Enum defining all possible game events
+05 //More events should be added to the list
+06 public enum EVENT_TYPE {GAME_INIT,
+07 GAME_END,
+08 AMMO_EMPTY,
+09 HEALTH_CHANGE,
+10 DEAD};
+11 //-----------------------------------------------------------
+12 //Listener interface to be implemented on Listener classes
+13 public interface IListener
+14 {
+15 //Notification function invoked when events happen
+16 void OnEvent(EVENT_TYPE Event_Type, Component Sender, Object Param
+= null);
+17 }
+18 //-----------------------------------------------------------

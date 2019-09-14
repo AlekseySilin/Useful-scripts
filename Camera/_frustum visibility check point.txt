@@ -1,0 +1,23 @@
+//---------------------------------------------------------
+//Determines if point is within frustum of camera
+//Returns true if point is within frustum, else false
+//The out param ViewPortLoc defines the location
+public static bool IsPointInFrustum(Vector3 Point, Camera Cam, out
+Vector3 ViewPortLoc)
+{
+	//Create new bounds with no size
+	Bounds B = new Bounds(Point, Vector3.zero);
+	//Construct frustum planes from camera
+	//Each plane represents one wall of frustrum
+	Plane[] planes =
+	GeometryUtility.CalculateFrustumPlanes(Cam);
+	//Test whether point is within frustum planes
+	bool IsVisible = GeometryUtility.TestPlanesAABB(planes,B);
+	//Assign viewport location
+	ViewPortLoc = Vector3.zero;
+	//If visible then get viewport location of point
+	if(IsVisible)
+	ViewPortLoc = Cam.WorldToViewportPoint(Point);
+	return IsVisible;
+}
+//---------------------------------------------------------

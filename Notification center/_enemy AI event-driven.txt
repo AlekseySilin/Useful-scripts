@@ -1,0 +1,77 @@
+using UnityEngine;
+using System.Collections;
+public class EnemyObject : MonoBehaviour
+{
+	//-------------------------------------------------------
+	//C# accessors for private variables
+	public int Health
+	{
+		get{return _health;}
+		set
+		{	
+			//Clamp health between 0-100
+			_health = Mathf.Clamp(value, 0, 100);
+			
+			//Post notification - health has been changed
+			EventManager.Instance.PostNotification(EVENT_TYPE.HEALTH_CHANGE, this, _health);
+			
+			//Check if dead
+			if(_health <= 0)
+			{
+				OnDead();
+				return;
+			}
+			//Check health and raise event if required
+			if(_health <= 20)
+			{
+				OnHealthLow();
+				return;
+			}
+		}
+	}
+	//-------------------------------------------------------
+	public int Ammo
+	{
+		get{return _ammo;}
+		set
+		{
+			//Clamp ammo between 0-50
+			_ammo = Mathf.Clamp(value,0,50);
+			//Check if ammo empty
+			if(_ammo <= 0)
+			{
+				//Call expired event
+				OnAmmoExpired();
+				return;
+			}
+		}
+	}
+	//-------------------------------------------------------
+	//Internal variables for health and ammo
+	private int _health = 100;
+	private int _ammo = 50;
+	//-------------------------------------------------------
+	// Update is called once per frame
+	void Update ()
+	{
+	}
+	//-------------------------------------------------------
+	//This event is called when health is low
+	void OnHealthLow()
+	{
+	//Handle event response here
+	}
+	//-------------------------------------------------------
+	//This event is called when enemy is dead
+	void OnDead()
+	{
+	//Handle event response here
+	}
+	//-------------------------------------------------------
+	//Ammo run out event
+	void OnAmmoExpired()
+	{
+	//Handle event response here
+	}
+//-------------------------------------------------------
+}
